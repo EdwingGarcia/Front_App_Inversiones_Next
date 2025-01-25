@@ -1,47 +1,60 @@
-'use client';  // Marca el archivo como cliente
+'use client'; // Marca el archivo como cliente
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';  // Uso del router de Next.js
-import Link from 'next/link';  // Usar Link de Next.js para la navegación
+import { useRouter } from 'next/navigation'; // Uso del router de Next.js
+import Link from 'next/link'; // Usar Link de Next.js para la navegación
 
 export default function InversionesLista() {
   const [inversiones, setInversiones] = useState([]);
   const [isMounted, setIsMounted] = useState(false);
-  const [routerReady, setRouterReady] = useState(false);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true); // Estado de carga
+  const [routerReady, setRouterReady] = useState(false); // Para verificar si el router está listo
   const router = useRouter();
 
-  // Verifica si el componente está montado (evita el renderizado en el servidor)
   useEffect(() => {
     setIsMounted(true);
-    setRouterReady(true);  // Se asegura de que router solo se use en el cliente
-    // Aquí debes cargar las inversiones desde tu API o fuente de datos
-    setInversiones([
-      {
-        id: 1,
-        broker: { nombre: 'Broker1' },
-        nombre: 'Inversión 1',
-        tipo: 'Acciones',
-        activo: { simbolo: 'AAPL' },
-        montoInvertido: 1000,
-        precioInversion: 150,
-        fechaInversion: '2025-01-01',
-        comentarios: 'Primera inversión',
-      },
-      {
-        id: 2,
-        broker: { nombre: 'Broker2' },
-        nombre: 'Inversión 2',
-        tipo: 'Criptomonedas',
-        activo: { simbolo: 'BTC' },
-        montoInvertido: 2000,
-        precioInversion: 30000,
-        fechaInversion: '2025-01-10',
-        comentarios: 'Segunda inversión',
-      },
-    ]);
-  }, []);
 
-  // Evitar el renderizado de useRouter en el servidor
+    // Asegurarse de que el router esté listo
+    setRouterReady(true);
+
+    // Obtener email y token guardados en el localStorage
+    const email = localStorage.getItem('email');
+    const token = localStorage.getItem('token');
+
+    // Redirigir al login si no hay email o token
+    if (!email || !token) {
+      router.push('/login');
+      return;
+    }
+
+    const fetchInversiones = async () => {
+      try {
+        const response = await fetch(`/api/inversiones?email=${email}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('No autorizado o error en la carga de inversiones');
+        }
+
+        const data = await response.json();
+        setInversiones(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false); // Finaliza la carga
+      }
+    };
+
+    fetchInversiones();
+  }, [router]);
+
+  // Evitar el renderizado en el servidor hasta que se haya montado el componente
   if (!isMounted || !routerReady) return null;
 
   return (

@@ -1,11 +1,11 @@
 'use client'
 import { useState } from 'react';
-import { useRouter } from 'next/navigation'; 
+import { useRouter } from 'next/navigation';
 import Head from 'next/head';
 
 export default function Login() {
-  const router = useRouter(); 
-  const [error, setError] = useState(null); 
+  const router = useRouter();
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -31,6 +31,10 @@ export default function Login() {
 
       const token = await response.text(); // El token retornado desde el backend
       console.log('Token recibido:', token); // Aquí se imprime el token en la consola
+
+      // Guardar el email y token de forma global (localStorage en este caso)
+      localStorage.setItem('email', email);
+      localStorage.setItem('token', token);
 
       // Si la autenticación es exitosa, rediriges al usuario a la página principal
       router.push('/principal');
