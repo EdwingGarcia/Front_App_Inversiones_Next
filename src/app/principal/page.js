@@ -60,10 +60,10 @@ export default function InversionesLista() {
   return (
     <div className="container mx-auto px-4 mt-4">
       <nav className="bg-gray-800 p-4">
-        <a href="/inversiones/listar" className="text-white text-xl">Sistema de Inversiones</a>
+        <a href="/principal" className="text-white text-xl">Sistema de Inversiones</a>
         <div className="flex justify-end mt-2">
-          <Link href="/inversiones/agregar" className="btn btn-primary text-white bg-blue-500 px-4 py-2 rounded">Agregar Nueva Inversión</Link>
-          <Link href="/inversiones/comparativa" className="btn btn-success text-white bg-green-500 ml-4 px-4 py-2 rounded">Comparativa de Datos</Link>
+          <Link href="/formulario/agregar" className="btn btn-primary text-white bg-blue-500 px-4 py-2 rounded">Agregar Nueva Inversión</Link>
+          <Link href="/comparativa" className="btn btn-success text-white bg-green-500 ml-4 px-4 py-2 rounded">Comparativa de Datos</Link>
         </div>
       </nav>
 
