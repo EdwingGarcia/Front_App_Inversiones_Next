@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // Uso del router de Next.js
 import Link from 'next/link'; // Usar Link de Next.js para la navegación
 
+
 export default function InversionesLista() {
   const [inversiones, setInversiones] = useState([]);
   const [isMounted, setIsMounted] = useState(false);
@@ -11,7 +12,30 @@ export default function InversionesLista() {
   const [loading, setLoading] = useState(true); // Estado de carga
   const [routerReady, setRouterReady] = useState(false); // Para verificar si el router está listo
   const router = useRouter();
-
+  const handleEliminar = async (id) => {
+    const confirmar = confirm(`¿Estás seguro de que deseas eliminar la inversión con id: ${id}?`);
+    if (!confirmar) return;
+  
+    try {
+      const response = await fetch(`/api/inversiones/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `${localStorage.getItem('token')}`,
+        },
+      });
+  
+      if (response.ok) {
+        alert('Inversión eliminada correctamente');
+        setInversiones(inversiones.filter((inversion) => inversion.id !== id));
+      } else {
+        alert('Error al eliminar la inversión');
+      }
+    } catch (error) {
+      console.error('Error al eliminar la inversión:', error.message);
+      alert('Hubo un problema al intentar eliminar la inversión');
+    }
+  };
+  
   useEffect(() => {
     setIsMounted(true);
 
@@ -97,16 +121,18 @@ export default function InversionesLista() {
                   <td className="px-6 py-3">{inversion.fechaInversion}</td>
                   <td className="px-6 py-3">{inversion.comentarios}</td>
                   <td className="px-6 py-3 flex space-x-4">
-                    <Link href={`/inversiones/editar/${inversion.id}`} className="text-blue-500 hover:text-blue-700">
-                      <i className="fas fa-edit"></i>
-                    </Link>
-                    <button
-                      onClick={() => alert(`Eliminar inversión con id: ${inversion.id}`)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <i className="fas fa-trash-alt"></i>
-                    </button>
-                  </td>
+  <Link href={`/formulario/${inversion.id}`} className="text-blue-500 hover:text-blue-700">
+    Editar
+  </Link>
+  <button
+    onClick={() => handleEliminar(inversion.id)}
+    className="text-red-500 hover:text-red-700"
+  >
+    Eliminar
+  </button>
+</td>
+
+
                 </tr>
               ))}
             </tbody>
